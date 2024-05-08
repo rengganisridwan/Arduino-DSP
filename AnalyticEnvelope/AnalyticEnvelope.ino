@@ -43,7 +43,7 @@ void loop() {
     Serial.print(signalAM);
 
     double outputHilbert = HilbertTransformer(signalAM);
-    double outputCenterTap = CenterTap(signalAM);
+    double outputCenterTap = DelayFilter(signalAM);
     double envelope = sqrt(outputCenterTap * outputCenterTap + outputHilbert * outputHilbert);
 
     Serial.print(",");
