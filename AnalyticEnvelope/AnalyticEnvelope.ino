@@ -5,7 +5,7 @@
   Author: Rengganis R.H. Santoso
 */
 
-const unsigned long SAMPLE_RATE = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
+const unsigned long SAMPLING_RATE = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
 const unsigned long BAUD_RATE = 115200;
 const float MODULATION_FREQUENCY = 3;
 const float CARRIER_FREQUENCY = 50;
@@ -29,7 +29,7 @@ void loop() {
   static long timer = 0;
   timer -= timeInterval;
   if (timer < 0) {
-    timer += 1000000 / SAMPLE_RATE;
+    timer += 1000000 / SAMPLING_RATE;
     double t = micros() / 1.0e6;
 
     // Here we use amplitude modulation (AM) as our input signal. The carrier
