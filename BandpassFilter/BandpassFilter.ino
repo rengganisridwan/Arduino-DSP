@@ -7,7 +7,7 @@
 
 const unsigned long SAMPLING_RATE = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
 const unsigned long BAUD_RATE = 115200;
-const float SIGNAL_FREQUENCY = 1;
+const float SIGNAL_FREQUENCY = 3;
 const float NOISE_FREQUENCY = 50;
 
 void setup() {
