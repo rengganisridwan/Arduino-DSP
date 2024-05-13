@@ -23,7 +23,7 @@ void loop() {
   static double timerMicrosecond = 0;
   timerMicrosecond -= timeIntervalMicrosecond;
   if (timerMicrosecond < 0) {
-    timerMicrosecond += 1000000 * (1 / SAMPLING_RATE_HZ);
+    timerMicrosecond += 1000000 / SAMPLING_RATE_HZ;
     double t = micros() / 1.0e6;
 
     double inputSignal = sin(2 * PI * SIGNAL_FREQUENCY_HZ * t) + 0.5 * sin(2 * PI * NOISE_FREQUENCY_HZ * t);
@@ -50,6 +50,7 @@ double BandstopFilter(double x_n) {
   double a[FILTER_ORDER + 1] = { 1.0000, -3.2076, 4.5368, -3.1511, 0.9651 };
 
   x[0] = x_n;
+
   y[0] = b[0] * x[0];
 
   for (int i = 1; i < FILTER_ORDER + 1; i++) {
