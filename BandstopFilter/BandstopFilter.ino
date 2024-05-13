@@ -5,28 +5,28 @@
   Author: Rengganis R.H. Santoso
 */
 
-const unsigned long SAMPLING_RATE = 500;
+const unsigned long SAMPLING_RATE_HZ = 500;
 const unsigned long BAUD_RATE = 115200;
-const float SIGNAL_FREQUENCY = 5;
-const float NOISE_FREQUENCY = 50;
+const double SIGNAL_FREQUENCY_HZ = 5;
+const double NOISE_FREQUENCY_HZ = 50;
 
 void setup() {
   Serial.begin(BAUD_RATE);
 }
 
 void loop() {
-  static unsigned long timePast = 0;
-  unsigned long timePresent = micros();
-  unsigned long timeInterval = timePresent - timePast;
-  timePast = timePresent;
+  static unsigned long pastTimeMicrosecond = 0;
+  unsigned long presentTimeMicrosecond = micros();
+  unsigned long timeIntervalMicrosecond = presentTimeMicrosecond - pastTimeMicrosecond;
+  pastTimeMicrosecond = presentTimeMicrosecond;
 
-  static long timer = 0;
-  timer -= timeInterval;
-  if (timer < 0) {
-    timer += 1000000 / SAMPLING_RATE;
+  static double timerMicrosecond = 0;
+  timerMicrosecond -= timeIntervalMicrosecond;
+  if (timerMicrosecond < 0) {
+    timerMicrosecond += 1000000 * (1 / SAMPLING_RATE_HZ);
     double t = micros() / 1.0e6;
 
-    double inputSignal = sin(2 * PI * SIGNAL_FREQUENCY * t) + 0.5 * sin(2 * PI * NOISE_FREQUENCY * t);
+    double inputSignal = sin(2 * PI * SIGNAL_FREQUENCY_HZ * t) + 0.5 * sin(2 * PI * NOISE_FREQUENCY_HZ * t);
     double filteredSignal = BandstopFilter(inputSignal);
 
     Serial.print(inputSignal);
@@ -50,13 +50,10 @@ double BandstopFilter(double x_n) {
   double a[FILTER_ORDER + 1] = { 1.0000, -3.2076, 4.5368, -3.1511, 0.9651 };
 
   x[0] = x_n;
+  y[0] = b[0] * x[0];
 
-  for (int i = 0; i < FILTER_ORDER + 1; i++) {
-    if (i == 0) {
-      y[0] = b[i] * x[i];
-    } else {
-      y[0] += b[i] * x[i] - a[i] * y[i];
-    }
+  for (int i = 1; i < FILTER_ORDER + 1; i++) {
+    y[0] += b[i] * x[i] - a[i] * y[i];
   }
 
   for (int i = FILTER_ORDER; i > 0; i--) {
