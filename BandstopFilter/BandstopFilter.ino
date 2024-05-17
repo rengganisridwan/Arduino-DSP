@@ -50,7 +50,6 @@ double BandstopFilter(double x_n) {
   double a[FILTER_ORDER + 1] = { 1.0000, -3.2076, 4.5368, -3.1511, 0.9651 };
 
   x[0] = x_n;
-
   y[0] = b[0] * x[0];
 
   for (int i = 1; i < FILTER_ORDER + 1; i++) {
