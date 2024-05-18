@@ -21,7 +21,6 @@ void loop() {
   unsigned long timeIntervalMicrosecond = presentTimeMicrosecond - pastTimeMicrosecond;  // Calculate the elapsed time
   pastTimeMicrosecond = presentTimeMicrosecond;                                          // Store the current time as the previous time for the next loop
 
-  // Run the timer
   // Subtract the timer by the elapsed time between subsequent loop. If the
   // timer value reaches zero, we do the measurement. Then, the timer value will
   // be added by the sampling time period. Thus, the measurement will be

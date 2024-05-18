@@ -5,35 +5,29 @@
   Author: Rengganis R.H. Santoso
 */
 
-const unsigned long SAMPLING_RATE = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
+const unsigned long SAMPLING_RATE_HZ = 500;
 const unsigned long BAUD_RATE = 115200;
-const float SIGNAL_FREQUENCY = 3;
-const float NOISE_FREQUENCY = 50;
+const double SIGNAL_FREQUENCY_HZ = 5;
+const double NOISE_FREQUENCY_HZ = 50;
 
 void setup() {
   Serial.begin(BAUD_RATE);
 }
 
 void loop() {
-  // Calculate elapsed time
-  static unsigned long timePast = 0;                    // Initiate static variable to store previous time
-  unsigned long timePresent = micros();                 // Obtain current time
-  unsigned long timeInterval = timePresent - timePast;  // Calculate the elapsed time
-  timePast = timePresent;                               // Store the current time as the previous time for the next loop
+  static unsigned long pastTimeMicrosecond = 0;
+  unsigned long presentTimeMicrosecond = micros();
+  unsigned long timeIntervalMicrosecond = presentTimeMicrosecond - pastTimeMicrosecond;
+  pastTimeMicrosecond = presentTimeMicrosecond;
 
-  // Run timer
-  // Subtract the timer by the elapsed time between subsequent loop. If the
-  // timer value reaches zero, we do the measurement. Then, the timer value will
-  // be added by the sampling time period. Thus, the measurement will be
-  // conducted in a periodic manner.
-  static long timer = 0;
-  timer -= timeInterval;
-  if (timer < 0) {
-    timer += 1000000 / SAMPLING_RATE;
+  static double timerMicrosecond = 0;
+  timerMicrosecond -= timeIntervalMicrosecond;
+  if (timerMicrosecond < 0) {
+    timerMicrosecond += 1000000 / SAMPLING_RATE_HZ;
     double t = micros() / 1.0e6;
 
     // Here we use a signal (f = 3 Hz) imbued with noise (f = 50 Hz)
-    double inputSignal = sin(2 * PI * SIGNAL_FREQUENCY * t) + 0.5 * sin(2 * PI * NOISE_FREQUENCY * t);
+    double inputSignal = sin(2 * PI * SIGNAL_FREQUENCY_HZ * t) + 0.5 * sin(2 * PI * NOISE_FREQUENCY_HZ * t);
 
     // We use bandpass filter to filter out the lower frequency signal
     double outputBandpass = BandpassFilter(inputSignal);
