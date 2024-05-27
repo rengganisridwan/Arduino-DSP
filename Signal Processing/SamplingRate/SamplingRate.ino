@@ -5,35 +5,35 @@
   Author: Rengganis R.H. Santoso
 */
 
-const unsigned long SAMPLING_RATE_HZ = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
-const unsigned long BAUD_RATE = 115200;
-const double SIGNAL_FREQUENCY_HZ = 3;
-const double NOISE_FREQUENCY_HZ = 50;
+const unsigned long kSamplingRateHz = 500;
+const unsigned long kBaudRate = 115200;
+const double kSignalFreqHz = 3;
+const double kNoiseFreqHz = 50;
 
 void setup() {
-  Serial.begin(BAUD_RATE);
+  Serial.begin(kBaudRate);
 }
 
 void loop() {
   // Calculate elapsed time
-  static unsigned long pastTimeMicrosecond = 0;                                          // Initiate static variable to store previous time
-  unsigned long presentTimeMicrosecond = micros();                                       // Obtain current time
-  unsigned long timeIntervalMicrosecond = presentTimeMicrosecond - pastTimeMicrosecond;  // Calculate the elapsed time
-  pastTimeMicrosecond = presentTimeMicrosecond;                                          // Store the current time as the previous time for the next loop
+  static unsigned long past_time_us = 0;                            // Initiate static variable to store previous time
+  unsigned long present_time_us = micros();                         // Obtain current time
+  unsigned long time_interval_us = present_time_us - past_time_us;  // Calculate the elapsed time
+  past_time_us = present_time_us;                                   // Store the current time as the previous time for the next loop
 
   // Subtract the timer by the elapsed time between subsequent loop. If the
   // timer value reaches zero, we do the measurement. Then, the timer value will
   // be added by the sampling time period. Thus, the measurement will be
   // conducted in a periodic manner.
-  static long timerMicrosecond = 0;
-  timerMicrosecond -= timeIntervalMicrosecond;
-  if (timerMicrosecond < 0) {
-    timerMicrosecond += 1000000 / SAMPLING_RATE_HZ;
+  static long timer_us = 0;
+  timer_us -= time_interval_us;
+  if (timer_us < 0) {
+    timer_us += 1000000 / kSamplingRateHz;
     double t = micros() / 1.0e6;
 
-    double inputSignal = sin(2 * PI * SIGNAL_FREQUENCY_HZ * t);
-    double noiseSignal = 0.5 * sin(2 * PI * NOISE_FREQUENCY_HZ * t);
-    double combinedSignal = inputSignal + noiseSignal;
-    Serial.println(combinedSignal);
+    double input_sig = sin(2 * PI * kSignalFreqHz * t);
+    double noise_sig = 0.5 * sin(2 * PI * kNoiseFreqHz * t);
+    double combined_sig = input_sig + noise_sig;
+    Serial.println(combined_sig);
   }
 }
