@@ -5,31 +5,31 @@
   Author: Rengganis R.H. Santoso
 */
 
-const unsigned long SAMPLING_RATE = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
-const unsigned long BAUD_RATE = 115200;
-const float MODULATION_FREQUENCY = 3;
-const float CARRIER_FREQUENCY = 50;
+const unsigned long kSamplingRate = 500;  // If this value changed, filter coefficients of all filter functions must be recalculated
+const unsigned long kBaudRate = 115200;
+const float kModulationFreqHz = 3;
+const float kCarrierFreqHz = 50;
 
 void setup() {
-  Serial.begin(BAUD_RATE);
+  Serial.begin(kBaudRate);
 }
 
 void loop() {
   // Calculate elapsed time
-  static unsigned long timePast = 0;                    // Initiate static variable to store previous time
-  unsigned long timePresent = micros();                 // Obtain current time
-  unsigned long timeInterval = timePresent - timePast;  // Calculate the elapsed time
-  timePast = timePresent;                               // Store the current time as the previous time for the next loop
+  static unsigned long past_time_us = 0;                    // Initiate static variable to store previous time
+  unsigned long present_time_us = micros();                 // Obtain current time
+  unsigned long time_interval_us = present_time_us - past_time_us;  // Calculate the elapsed time
+  past_time_us = present_time_us;                               // Store the current time as the previous time for the next loop
 
   // Run timer
   // Subtract the timer by the elapsed time between subsequent loop. If the
   // timer value reaches zero, we do the measurement. Then, the timer value will
   // be added by the sampling time period. Thus, the measurement will be
   // conducted in a periodic manner.
-  static long timer = 0;
-  timer -= timeInterval;
-  if (timer < 0) {
-    timer += 1000000 / SAMPLING_RATE;
+  static long timer_us = 0;
+  timer_us -= time_interval_us;
+  if (timer_us < 0) {
+    timer_us += 1000000 / kSamplingRate;
     double t = micros() / 1.0e6;
 
     // Here we use amplitude modulation (AM) as our input signal. The carrier
@@ -37,19 +37,19 @@ void loop() {
     // of the modulation signal. First, the modulation signal amplitude is
     // shifted by one. Then, its instantaneous amplitude value is multiplied
     // with the instantaneous amplitude of the carrier signal.
-    double modulationSignal = sin(2 * PI * MODULATION_FREQUENCY * t);  // Modulation signal (f = 3 Hz)
-    double carrierSignal = sin(2 * PI * CARRIER_FREQUENCY * t);        // Carrier signal (f = 50 Hz)
-    double signalAM = (1 + modulationSignal) * carrierSignal;
-    Serial.print(signalAM);
+    double modulation_signal = sin(2 * PI * kModulationFreqHz * t);  // Modulation signal (f = 3 Hz)
+    double carrier_signal = sin(2 * PI * kCarrierFreqHz * t);        // Carrier signal (f = 50 Hz)
+    double AM_signal = (1 + modulation_signal) * carrier_signal;
+    Serial.print(AM_signal);
 
-    double outputHilbert = HilbertTransformer(signalAM);
-    double outputCenterTap = DelayFilter(signalAM);
-    double envelope = sqrt(outputCenterTap * outputCenterTap + outputHilbert * outputHilbert);
+    double hilbert_output = HilbertTransformer(AM_signal);
+    double center_tap_output = DelayFilter(AM_signal);
+    double envelope = sqrt(center_tap_output * center_tap_output + hilbert_output * hilbert_output);
 
     Serial.print(",");
-    Serial.print(outputHilbert);
+    Serial.print(hilbert_output);
     Serial.print(",");
-    Serial.print(outputCenterTap);
+    Serial.print(center_tap_output);
     Serial.print(",");
     Serial.println(envelope);
   }
