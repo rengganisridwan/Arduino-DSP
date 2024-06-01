@@ -1,9 +1,22 @@
-const unsigned long kSamplingRateHz = 500;
-const unsigned long kBaudRate = 115200;
-const double kSignalFreqHz = 75;
+/*
+  Generate Sinewave
+
+  Author: Rengganis R.H. Santoso
+*/
+
+#include <MegunoLink.h>
+TimePlot MyPlot;
+
+const unsigned long kSamplingRateHz = 300;
+const unsigned long kBaudRate = 500000;
+const double kSignalFreqHz_1 = 1;
+const double kSignalFreqHz_2 = 10;
 
 void setup() {
   Serial.begin(kBaudRate);
+
+  MyPlot.SetSeriesProperties("signal_1", Plot::Blue, Plot::Solid, 1, Plot::NoMarker);
+  MyPlot.SetSeriesProperties("signal_2", Plot::Red, Plot::Solid, 1, Plot::NoMarker);
 }
 
 void loop() {
@@ -18,10 +31,15 @@ void loop() {
     timer_us += 1e6 / kSamplingRateHz;
 
     double t = micros() / 1.0e6;
-    double input_sig = sin(2 * PI * kSignalFreqHz * t);
-    double loop_exec_time_us = (micros() - present_time_us);
+    int t_ms = millis();
+    double input_signal_1 = sin(2 * PI * kSignalFreqHz_1 * t);
+    double input_signal_2 = sin(2 * PI * kSignalFreqHz_2 * t);
     
-    String to_print = String(input_sig) + "," + String(loop_exec_time_us);
-    Serial.println(to_print);
+    // String to_print = String(t_ms) + "," + String(input_signal_1) + "," + String(input_signal_2);
+    // Serial.println(to_print);
+
+    MyPlot.SendData("time (ms)",t_ms);
+    MyPlot.SendData("signal 1",input_signal_1);
+    MyPlot.SendData("signal 2",input_signal_2);
   }
 }
