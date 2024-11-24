@@ -8,44 +8,44 @@
 #include <MegunoLink.h>
 TimePlot MyPlot;
 
-const unsigned long kSamplingRate = 500;
-const unsigned long kBaudRate = 230400;
-const double kSignalFreqHz = 5;
-const double kNoiseFreqHz = 50;
+const unsigned long SAMPLING_RATE = 300;
+const unsigned long BAUD_RATE = 500000;
+// const double kSignalFreqHz = 5;
+// const double kNoiseFreqHz = 50;
 
 void setup() {
-  Serial.begin(kBaudRate);
+  Serial.begin(BAUD_RATE);
 }
 
 void loop() {
-  static unsigned long past_time_us = 0;
-  unsigned long present_time_us = micros();
-  unsigned long time_interval_us = present_time_us - past_time_us;
-  past_time_us = present_time_us;
+  static unsigned long tPast = 0;
+  unsigned long tPresent = micros();
+  unsigned long tInterval = tPresent - tPast;
+  tPast = tPresent;
 
-  static double timer_us = 0;
-  timer_us -= time_interval_us;
-  if (timer_us < 0) {
-    timer_us += 1000000 / kSamplingRate;
+  static double timer = 0;
+  timer -= tInterval;
+  if (timer < 0) {
+    timer += 1e6 / SAMPLING_RATE;
     double t = micros() / 1.0e6;
 
-    double main_signal = sin(2 * PI * kSignalFreqHz * t);
-    double noise_signal = 0.5 * sin(2 * PI * kNoiseFreqHz * t);
-    double input_signal = main_signal + noise_signal;
-    // double input_signal = analogRead(A0);
+    // double main_signal = sin(2 * PI * kSignalFreqHz * t);
+    // double noise_signal = 0.5 * sin(2 * PI * kNoiseFreqHz * t);
+    // double input_signal = main_signal + noise_signal;
+    double inputSig = analogRead(A0);
 
-    double output_bandpass = BandpassFilter(input_signal);
+    double outputSig = BandpassFilter(input_signal);
 
     // Now we use the same specification of the previous bandpass filter but 
     // with different structure. The following bandpass filter is composed of 
     // second-order sections.
-    // double output_bandpass_sos_1 = BandpassFilter_SOS1(input_sig);
-    // double output_bandpass_sos_2 = BandpassFilter_SOS2(output_bandpass_sos_1);
+    // double outputSig_sos_1 = BandpassFilter_SOS1(input_sig);
+    // double outputSig_sos_2 = BandpassFilter_SOS2(outputSig_sos_1);
 
     // Send the results via serial
-    // String to_print = String(input_signal) + "," + String(output_bandpass);
+    // String to_print = String(input_signal) + "," + String(outputSig);
     // Serial.println(to_print);
-    MyPlot.SendData("CH-01",input_signal);
+    MyPlot.SendData("CH-01",outputSig);
   }
 }
 
